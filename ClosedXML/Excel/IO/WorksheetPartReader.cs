@@ -749,6 +749,23 @@ internal class WorksheetPartReader
                 ws.SheetView.SplitRow = (Int32)pane.VerticalSplit.Value;
         }
 
+        if (sheetView.View !=null)
+        {
+     
+            switch (sheetView.View.InnerText)
+            {
+                case "pageLayout":
+                    ws.SheetView.View = XLSheetViewOptions.PageLayout;
+                    break;
+                case "pageBreakPreview":
+                    ws.SheetView.View = XLSheetViewOptions.PageBreakPreview;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
         if (XLHelper.IsValidA1Address(sheetView.TopLeftCell))
             ws.SheetView.TopLeftCellAddress = ws.Cell(sheetView.TopLeftCell.Value).Address;
     }
