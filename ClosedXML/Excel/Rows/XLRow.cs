@@ -15,6 +15,7 @@ namespace ClosedXML.Excel
         private XlRowFlags _flags;
         private Double _height;
         private Int32 _outlineLevel;
+        private string _spans;
 
         #endregion Private fields
 
@@ -29,6 +30,7 @@ namespace ClosedXML.Excel
             SetRowNumber(row);
 
             _height = worksheet.RowHeight;
+            _spans = "";
         }
 
         #endregion Constructor
@@ -132,6 +134,17 @@ namespace ClosedXML.Excel
                 _height = value;
             }
         }
+
+        public string Spans
+        {
+            get { return _spans; }
+            set
+            {
+                _spans = value;
+            }
+        }
+
+
 
         IXLCells IXLRow.Cells(String cellsInRow) => Cells(cellsInRow);
 

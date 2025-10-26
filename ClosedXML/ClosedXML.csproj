@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <LangVersion>11.0</LangVersion>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <!-- netstandard 2.0 doesn't contain nullable annotations for BCL, so we want to export
          annotations for our consumers, but no warnings for our code. Warnings will be
          emitted by netstandard2.1 target -->
@@ -46,7 +46,6 @@
     </PackageReference>
     <PackageReference Include="RBush.Signed" Version="4.0.0" />
     <PackageReference Include="SixLabors.Fonts" Version="1.0.0" />
-    <PackageReference Include="ClosedXML.Parser" Version="2.0.0-preview1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
@@ -57,5 +56,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ClosedXML.IO\ClosedXML.IO.csproj" />
+    <ProjectReference Include="..\ClosedXML.Parser\src\ClosedXML.Parser\ClosedXML.Parser.csproj" />
   </ItemGroup>
 </Project>

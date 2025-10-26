@@ -92,6 +92,8 @@ namespace ClosedXML.Excel
             TabColor = XLColor.NoColor;
             _selectedRanges = new XLRanges();
 
+            DrawingId = "";
+
             Author = workbook.Author;
         }
 
@@ -114,6 +116,12 @@ namespace ClosedXML.Excel
         /// a single legacy VML file, set during load/save.
         /// </summary>
         public string? LegacyDrawingId;
+
+
+        /// <summary>
+        /// DrawingId
+        /// </summary>
+        public string DrawingId { get; internal set; }
 
         private Double _columnWidth;
 
@@ -1754,6 +1762,8 @@ namespace ClosedXML.Excel
         public Boolean IsPasswordProtected => Protection.IsPasswordProtected;
 
         public bool IsProtected => Protection.IsProtected;
+
+      
 
         public IXLPicture Picture(string pictureName)
         {

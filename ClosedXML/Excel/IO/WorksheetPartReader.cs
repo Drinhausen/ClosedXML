@@ -113,6 +113,8 @@ internal class WorksheetPartReader
                     LoadExtensions((WorksheetExtensionList)reader.LoadCurrentElement(), ws);
                 else if (reader.ElementType == typeof(LegacyDrawing))
                     ws.LegacyDrawingId = (reader.LoadCurrentElement() as LegacyDrawing).Id.Value;
+                else if (reader.ElementType == typeof(Drawing))
+                    ws.DrawingId = (reader.LoadCurrentElement() as Drawing).Id.Value;
             }
             reader.Close();
         }
@@ -217,6 +219,11 @@ internal class WorksheetPartReader
 
         var xlRow = ws.Row(rowIndex, false);
 
+        var spans = attributes.GetAttribute("spans");
+        if (spans is not null)
+        {
+            xlRow.Spans = spans;
+        }
         var height = attributes.GetDoubleAttribute("ht");
         if (height is not null)
         {

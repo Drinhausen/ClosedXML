@@ -229,6 +229,7 @@ namespace ClosedXML.Excel
                 WorksheetPart worksheetPart;
                 var wsRelId = worksheet.RelId;
                 bool partIsEmpty;
+
                 if (workbookPart.Parts.Any(p => p.RelationshipId == wsRelId))
                 {
                     worksheetPart = (WorksheetPart)workbookPart.GetPartById(wsRelId);

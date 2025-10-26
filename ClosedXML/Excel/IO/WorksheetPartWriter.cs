@@ -1324,6 +1324,9 @@ namespace ClosedXML.Excel.IO
                 xlPictures.Deleted.Clear();
             }
 
+            
+
+
             foreach (var pic in xlWorksheet.Pictures)
             {
                 AddPictureAnchor(worksheetPart, pic, context);
@@ -1332,7 +1335,10 @@ namespace ClosedXML.Excel.IO
             if (xlWorksheet.Pictures.Any())
                 RebaseNonVisualDrawingPropertiesIds(worksheetPart);
 
+
             var tableParts = worksheet.Elements<TableParts>().First();
+
+            //Pictures
             if (xlWorksheet.Pictures.Any() && !worksheet.OfType<Drawing>().Any())
             {
                 var worksheetDrawing = new Drawing { Id = worksheetPart.GetIdOfPart(worksheetPart.DrawingsPart) };
@@ -1341,18 +1347,20 @@ namespace ClosedXML.Excel.IO
                 cm.SetElement(XLWorksheetContents.Drawing, worksheet.Elements<Drawing>().First());
             }
 
+
+
             // Instead of saving a file with an empty Drawings.xml file, rather remove the .xml file
-            var hasCharts = worksheetPart.DrawingsPart is not null && worksheetPart.DrawingsPart.Parts.Any();
-            if (worksheetPart.DrawingsPart is not null && // There is a drawing part for the sheet that could be deleted
-                xlWorksheet.LegacyDrawingId is null && // and sheet doesn't contain any form controls or comments or other shapes
-                !xlWorksheet.Pictures.Any() && // and also no pictures.
-                !hasCharts) // and no charts
-            {
-                var id = worksheetPart.GetIdOfPart(worksheetPart.DrawingsPart);
-                worksheet.RemoveChild(worksheet.OfType<Drawing>().FirstOrDefault(p => p.Id == id));
-                worksheetPart.DeletePart(worksheetPart.DrawingsPart);
-                cm.SetElement(XLWorksheetContents.Drawing, null);
-            }
+            //var hasCharts = worksheetPart.DrawingsPart is not null && worksheetPart.DrawingsPart.Parts.Any();
+            //if (worksheetPart.DrawingsPart is not null && // There is a drawing part for the sheet that could be deleted
+            //    xlWorksheet.LegacyDrawingId is null && // and sheet doesn't contain any form controls or comments or other shapes
+            //    !xlWorksheet.Pictures.Any() && // and also no pictures.
+            //    !hasCharts) // and no charts
+            //{
+            //    var id = worksheetPart.GetIdOfPart(worksheetPart.DrawingsPart);
+            //    worksheet.RemoveChild(worksheet.OfType<Drawing>().FirstOrDefault(p => p.Id == id));
+            //    worksheetPart.DeletePart(worksheetPart.DrawingsPart);
+            //    cm.SetElement(XLWorksheetContents.Drawing, null);
+            //}
 
             #endregion Drawings
 
@@ -2116,7 +2124,12 @@ namespace ClosedXML.Excel.IO
                 if (maxColumn > 0)
                 {
                     w.WriteStartAttribute("spans");
-                    w.WriteString("1:");
+
+                    //if (xlRow.Spans != "" && !xlRow.Spans.StartsWith("1:"))
+                    //    w.WriteString(xlRow.Spans.Split(":")[0].Trim()+":");
+                    //else
+                        w.WriteString("1:");
+
                     w.WriteValue(maxColumn);
                     w.WriteEndAttribute();
                 }
@@ -2134,7 +2147,6 @@ namespace ClosedXML.Excel.IO
                     // Note that dyDescent automatically implies custom height
                     w.WriteAttributeString("customHeight", TrueValue);
                 }
-
                 if (xlRow.IsHidden)
                 {
                     w.WriteAttributeString("hidden", TrueValue);

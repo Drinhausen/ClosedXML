@@ -488,65 +488,66 @@ namespace ClosedXML.Excel
                     var imgId = GetImageRelIdFromAnchor(anchor);
 
                     //If imgId is null, we're probably dealing with a TextBox (or another shape) instead of a picture
-                    if (imgId == null) continue;
-
-                    var imagePart = drawingsPart.GetPartById(imgId);
-                    using (var stream = imagePart.GetStream())
-                    using (var ms = new MemoryStream())
+                    if (imgId != null)
                     {
-                        stream.CopyTo(ms);
-                        var vsdp = GetPropertiesFromAnchor(anchor);
-
-                        var picture = ws.AddPicture(ms, vsdp.Name, Convert.ToInt32(vsdp.Id.Value)) as XLPicture;
-                        picture.RelId = imgId;
-
-                        Xdr.ShapeProperties spPr = anchor.Descendants<Xdr.ShapeProperties>().First();
-                        picture.Placement = XLPicturePlacement.FreeFloating;
-
-                        if (spPr?.Transform2D?.Extents?.Cx.HasValue ?? false)
-                            picture.Width = ConvertFromEnglishMetricUnits(spPr.Transform2D.Extents.Cx, ws.Workbook.DpiX);
-
-                        if (spPr?.Transform2D?.Extents?.Cy.HasValue ?? false)
-                            picture.Height = ConvertFromEnglishMetricUnits(spPr.Transform2D.Extents.Cy, ws.Workbook.DpiY);
-
-                        if (anchor is Xdr.AbsoluteAnchor)
+                        var imagePart = drawingsPart.GetPartById(imgId);
+                        using (var stream = imagePart.GetStream())
+                        using (var ms = new MemoryStream())
                         {
-                            var absoluteAnchor = anchor as Xdr.AbsoluteAnchor;
-                            picture.MoveTo(
-                                ConvertFromEnglishMetricUnits(absoluteAnchor.Position.X.Value, ws.Workbook.DpiX),
-                                ConvertFromEnglishMetricUnits(absoluteAnchor.Position.Y.Value, ws.Workbook.DpiY)
-                            );
-                        }
-                        else if (anchor is Xdr.OneCellAnchor)
-                        {
-                            var oneCellAnchor = anchor as Xdr.OneCellAnchor;
-                            var from = LoadMarker(ws, oneCellAnchor.FromMarker);
-                            picture.MoveTo(from.Cell, from.Offset);
-                        }
-                        else if (anchor is Xdr.TwoCellAnchor)
-                        {
-                            var twoCellAnchor = anchor as Xdr.TwoCellAnchor;
-                            var from = LoadMarker(ws, twoCellAnchor.FromMarker);
-                            var to = LoadMarker(ws, twoCellAnchor.ToMarker);
+                            stream.CopyTo(ms);
+                            var vsdp = GetPropertiesFromAnchor(anchor);
 
-                            if (twoCellAnchor.EditAs == null || !twoCellAnchor.EditAs.HasValue || twoCellAnchor.EditAs.Value == Xdr.EditAsValues.TwoCell)
+                            var picture = ws.AddPicture(ms, vsdp.Name, Convert.ToInt32(vsdp.Id.Value)) as XLPicture;
+                            picture.RelId = imgId;
+
+                            Xdr.ShapeProperties spPr = anchor.Descendants<Xdr.ShapeProperties>().First();
+                            picture.Placement = XLPicturePlacement.FreeFloating;
+
+                            if (spPr?.Transform2D?.Extents?.Cx.HasValue ?? false)
+                                picture.Width = ConvertFromEnglishMetricUnits(spPr.Transform2D.Extents.Cx, ws.Workbook.DpiX);
+
+                            if (spPr?.Transform2D?.Extents?.Cy.HasValue ?? false)
+                                picture.Height = ConvertFromEnglishMetricUnits(spPr.Transform2D.Extents.Cy, ws.Workbook.DpiY);
+
+                            if (anchor is Xdr.AbsoluteAnchor)
                             {
-                                picture.MoveTo(from.Cell, from.Offset, to.Cell, to.Offset);
+                                var absoluteAnchor = anchor as Xdr.AbsoluteAnchor;
+                                picture.MoveTo(
+                                    ConvertFromEnglishMetricUnits(absoluteAnchor.Position.X.Value, ws.Workbook.DpiX),
+                                    ConvertFromEnglishMetricUnits(absoluteAnchor.Position.Y.Value, ws.Workbook.DpiY)
+                                );
                             }
-                            else if (twoCellAnchor.EditAs.Value == Xdr.EditAsValues.Absolute)
+                            else if (anchor is Xdr.OneCellAnchor)
                             {
-                                var shapeProperties = twoCellAnchor.Descendants<Xdr.ShapeProperties>().FirstOrDefault();
-                                if (shapeProperties != null)
-                                {
-                                    picture.MoveTo(
-                                        ConvertFromEnglishMetricUnits(spPr.Transform2D.Offset.X, ws.Workbook.DpiX),
-                                        ConvertFromEnglishMetricUnits(spPr.Transform2D.Offset.Y, ws.Workbook.DpiY)
-                                    );
-                                }
-                            }
-                            else if (twoCellAnchor.EditAs.Value == Xdr.EditAsValues.OneCell)
-                            {
+                                var oneCellAnchor = anchor as Xdr.OneCellAnchor;
+                                var from = LoadMarker(ws, oneCellAnchor.FromMarker);
                                 picture.MoveTo(from.Cell, from.Offset);
+                            }
+                            else if (anchor is Xdr.TwoCellAnchor)
+                            {
+                                var twoCellAnchor = anchor as Xdr.TwoCellAnchor;
+                                var from = LoadMarker(ws, twoCellAnchor.FromMarker);
+                                var to = LoadMarker(ws, twoCellAnchor.ToMarker);
+
+                                if (twoCellAnchor.EditAs == null || !twoCellAnchor.EditAs.HasValue || twoCellAnchor.EditAs.Value == Xdr.EditAsValues.TwoCell)
+                                {
+                                    picture.MoveTo(from.Cell, from.Offset, to.Cell, to.Offset);
+                                }
+                                else if (twoCellAnchor.EditAs.Value == Xdr.EditAsValues.Absolute)
+                                {
+                                    var shapeProperties = twoCellAnchor.Descendants<Xdr.ShapeProperties>().FirstOrDefault();
+                                    if (shapeProperties != null)
+                                    {
+                                        picture.MoveTo(
+                                            ConvertFromEnglishMetricUnits(spPr.Transform2D.Offset.X, ws.Workbook.DpiX),
+                                            ConvertFromEnglishMetricUnits(spPr.Transform2D.Offset.Y, ws.Workbook.DpiY)
+                                        );
+                                    }
+                                }
+                                else if (twoCellAnchor.EditAs.Value == Xdr.EditAsValues.OneCell)
+                                {
+                                    picture.MoveTo(from.Cell, from.Offset);
+                                }
                             }
                         }
                     }
